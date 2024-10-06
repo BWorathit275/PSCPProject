@@ -10,4 +10,4 @@ async def on_ready():
 
 @client.command()
 async def testcommand(ctx):
-    await ctx.send("Gomen,  Amanai")
+    await ctx.send("The One Piece,  Is Real")
