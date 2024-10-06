@@ -8,3 +8,6 @@ async def on_ready():
     print("Bot is Ready")
     print(":)")
 
+@client.command()
+async def testcommand(ctx):
+    await ctx.send("Gomen,  Amanai")
