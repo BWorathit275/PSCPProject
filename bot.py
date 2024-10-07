@@ -5,7 +5,7 @@ import random
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv('token.env')
 tokencode = os.getenv('token')
 
 logger = logging.getLogger('discord_bot')
