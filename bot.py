@@ -15,7 +15,8 @@ console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(
 logger.addHandler(console_handler)
 
 intents = discord.Intents.default()
-intents.messages = True
+intents.messages = True  # Allows bot to receive message events
+intents.message_content = True  # Allows bot to read the message content (for prefix commands)
 client = commands.Bot(command_prefix='!', intents=intents)
 
 @tasks.loop(minutes=1.0)
