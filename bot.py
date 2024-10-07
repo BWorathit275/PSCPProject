@@ -1,6 +1,7 @@
 import os
 import discord
 import logging
+import random
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -17,6 +18,10 @@ intents = discord.Intents.default()
 intents.messages = True
 client = commands.Bot(command_prefix='!', intents=intents)
 
+@tasks.loop(minutes=1.0)
+async def status_task():
+    statuses = ["tbd", "tbd!", "tbd"]
+    await client.change_presence(activity=discord.Game(random.choice(statuses)))
 
 @client.event
 async def on_ready():
