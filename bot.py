@@ -29,6 +29,7 @@ async def on_ready():
     """status"""
     print("Bot is Ready")
     print(":)")
+    status_task.start()
 
 @client.command()
 async def hi(ctx):
