@@ -1,17 +1,22 @@
 import os
 import discord
-from discord.ext import commands
+import logging
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-
-# Load environment variables from .env file
 load_dotenv()
 tokencode = os.getenv('DISCORD_TOKEN')
 
-intents = discord.Intents.default()
-intents.messages = True  # Allows bot to receive message events
+logger = logging.getLogger('discord_bot')
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(console_handler)
 
+intents = discord.Intents.default()
+intents.messages = True
 client = commands.Bot(command_prefix='!', intents=intents)
+
 
 @client.event
 async def on_ready():
