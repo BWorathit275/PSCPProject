@@ -6,7 +6,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 load_dotenv()
-tokencode = os.getenv('DISCORD_TOKEN')
+tokencode = os.getenv('token')
 
 logger = logging.getLogger('discord_bot')
 logger.setLevel(logging.INFO)
