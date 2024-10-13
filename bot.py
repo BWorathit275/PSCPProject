@@ -6,6 +6,7 @@ import requests
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
+
 load_dotenv('token.env')
 tokencode = os.getenv('token')
 weather_api_key = os.getenv('weatherapi')
@@ -53,19 +54,46 @@ async def cmds(ctx):
     """
     await ctx.send(help_text)
 
+@client.command()
+async def weather(ctx, *, city: str):
+    """fetches the weather forecast for specified city."""
+    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        'q': city,
+        'appid': weather_api_key,
+        'units': 'metric'
+    }
+
+    try:
+        response = requests.get(base_url, params=params)
+        data = response.json()
+
+        if data['cod'] != 200:
+            await ctx.send(f"Error: {data['message']}")
+            return
+
+        weather_report = (
+        )
+        await ctx.send(weather_report)
+
+    except Exception as e:
+        logger.error(f"Error fetching weather data: {e}")
+        await ctx.send("Sorry, I couldn't retrieve the weather at the moment.")
+
+
 
 # Error Handling
 @client.event
 async def on_command_error(ctx, error):
     """Handle command errors."""
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("placeholder")
+        await ctx.send("no")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("placeholder")
+        await ctx.send("uhh")
     elif isinstance(error, commands.BadArgument):
         await ctx.send("placeholder")
     elif isinstance(error, commands.CommandOnCooldown):
-        await ctx.send(f"placeholder")
+        await ctx.send("placeholder")
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send("placeholder")
     else:
