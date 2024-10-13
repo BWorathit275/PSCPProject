@@ -2,11 +2,13 @@ import os
 import discord
 import logging
 import random
+import requests
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 load_dotenv('token.env')
 tokencode = os.getenv('token')
+weather_api_key = os.getenv('weatherapi')
 
 # Set up logger
 logger = logging.getLogger('discord_bot')
@@ -50,6 +52,8 @@ async def cmds(ctx):
     - `!hi`: test command
     """
     await ctx.send(help_text)
+
+
 
 # Run the bot with the token from the environment variable
 client.run(tokencode)
