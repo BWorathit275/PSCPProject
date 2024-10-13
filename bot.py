@@ -54,6 +54,24 @@ async def cmds(ctx):
     await ctx.send(help_text)
 
 
+# Error Handling
+@client.event
+async def on_command_error(ctx, error):
+    """Handle command errors."""
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("placeholder")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("placeholder")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("placeholder")
+    elif isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"placeholder")
+    elif isinstance(error, commands.MissingPermissions):
+        await ctx.send("placeholder")
+    else:
+        # Other error
+        logger.error(f"An error occurred: {error}")
+        await ctx.send("placeholder")
 
 # Run the bot with the token from the environment variable
 client.run(tokencode)
