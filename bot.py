@@ -72,7 +72,11 @@ async def weather(ctx, *, city: str):
             await ctx.send(f"Error: {data['message']}")
             return
 
+        city_name = data['name']
+        country = data['sys']['country']
+        
         weather_report = (
+            f"**Weather in {city_name}, {country}:**\n"
         )
         await ctx.send(weather_report)
 
