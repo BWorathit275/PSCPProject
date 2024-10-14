@@ -74,9 +74,17 @@ async def weather(ctx, *, city: str):
 
         city_name = data['name']
         country = data['sys']['country']
+        temperature = data['main']['temp']
+        weather_description = data['weather'][0]['description'].capitalize()
+        humidity = data['main']['humidity']
+        wind_speed = data['wind']['speed']
         
         weather_report = (
             f"**Weather in {city_name}, {country}:**\n"
+            f"🌡️ Temperature: {temperature}°C\n"
+            f"🌤️ Condition: {weather_description}\n"
+            f"💧 Humidity: {humidity}%\n"
+            f"🌬️ Wind Speed: {wind_speed} m/s"
         )
         await ctx.send(weather_report)
 
