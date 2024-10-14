@@ -99,19 +99,19 @@ async def weather(ctx, *, city: str):
 async def on_command_error(ctx, error):
     """Handle command errors."""
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("no")
+        await ctx.send("Error : CommandNotFound")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("uhh")
+        await ctx.send("Error : MissingRequiredArgument")
     elif isinstance(error, commands.BadArgument):
-        await ctx.send("placeholder")
+        await ctx.send("Error : BadArgument")
     elif isinstance(error, commands.CommandOnCooldown):
-        await ctx.send("placeholder")
+        await ctx.send("Error : CommandOnCooldown")
     elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("placeholder")
+        await ctx.send("Error : MissingPermissions")
     else:
         # Other error
         logger.error(f"An error occurred: {error}")
-        await ctx.send("placeholder")
+        await ctx.send("Error : An error occurred")
 
 # Run the bot with the token from the environment variable
 client.run(tokencode)
