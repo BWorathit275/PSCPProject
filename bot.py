@@ -6,6 +6,24 @@ import requests
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
+weather_emojis = {
+    "clear sky": "☀️",
+    "few clouds": "🌤️",
+    "scattered clouds": "☁️",
+    "broken clouds": "⛅",
+    "shower rain": "🌧️",
+    "rain": "🌦️",
+    "thunderstorm": "⛈️",
+    "snow": "❄️",
+    "mist": "🌫️",
+    "haze": "🌫️",
+    "overcast clouds": "☁️",
+    "fog": "🌫️",
+    "light rain": "🌧️",
+    "moderate rain": "🌧️🌧️",
+    "heavy rain": "🌧️🌧️🌧️",
+}
+
 
 load_dotenv('token.env')
 tokencode = os.getenv('token')
@@ -78,11 +96,12 @@ async def weather(ctx, *, city: str):
         weather_description = data['weather'][0]['description'].capitalize()
         humidity = data['main']['humidity']
         wind_speed = data['wind']['speed']
+        weather_emoji = weather_emojis.get(weather_description.lower(), "🌍")
         
         weather_report = (
             f"**Weather in {city_name}, {country}:**\n"
             f"🌡️ Temperature: {temperature}°C\n"
-            f"🌤️ Condition: {weather_description}\n"
+            f"{weather_emojis} Condition: {weather_description.capitalize()} \n"
             f"💧 Humidity: {humidity}%\n"
             f"🌬️ Wind Speed: {wind_speed} m/s"
         )
