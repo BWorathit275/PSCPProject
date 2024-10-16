@@ -65,7 +65,7 @@ async def weather(ctx, *, city: str):
     """Fetches the weather forecast for the specified city."""
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
-    
+
     # Check if the city is in the custom cities dict
     if city.lower() in custom_cities:
         # Use the custom latitude and longitude for the request
