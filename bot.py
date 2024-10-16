@@ -49,11 +49,13 @@ client = commands.Bot(command_prefix='!', intents=intents)
 
 @tasks.loop(minutes=1.0)
 async def status_task():
+    """status task"""
     statuses = ["tbd", "tbd!", "tbd"]
     await client.change_presence(activity=discord.Game(random.choice(statuses)))
 
 @client.event
 async def on_ready():
+    """status check"""
     print("Bot is Ready")
     print(":)")
     status_task.start()
@@ -63,7 +65,7 @@ async def weather(ctx, *, city: str):
     """Fetches the weather forecast for the specified city."""
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
-    
+
     # Check if the city is in the custom cities dict
     if city.lower() in custom_cities:
         # Use the custom latitude and longitude for the request
@@ -76,7 +78,7 @@ async def weather(ctx, *, city: str):
             'units': 'metric'
         }
         # Set the city_name to the custom city name
-        city_name = city.title()  
+        city_name = city.title()
         country = "Custom Location"
     else:
         # Use the Geocoding API if the city isn't in the custom cities dictionary
@@ -124,7 +126,7 @@ async def weather(ctx, *, city: str):
         weather_report = (
             f"**Weather in {city_name}, {country}:**\n"
             f"🌡️ Temperature: {temperature}°C\n"
-            f"{weather_emoji} Condition: {weather_description.capitalize()} \n"
+            f"{weather_emoji} Condition: {weather_description.capitalize()} \n")
         city_name = data['name']
         country = data['sys']['country']
         temperature = data['main']['temp']
@@ -132,7 +134,7 @@ async def weather(ctx, *, city: str):
         humidity = data['main']['humidity']
         wind_speed = data['wind']['speed']
         weather_emoji = weather_emojis.get(weather_description.lower(), "🌍")
-        
+
         weather_report = (
             f"**Weather in {city_name}, {country}:**\n"
             f"🌡️ Temperature: {temperature}°C\n"
