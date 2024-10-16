@@ -78,7 +78,7 @@ async def weather(ctx, *, city: str):
             'units': 'metric'
         }
         # Set the city_name to the custom city name
-        city_name = city.capitalize()  # Capitalize the city name for display
+        city_name = city.title()  # Capitalize the city name for display
         country = "Custom Location"  # Optional: Set a placeholder country name
     else:
         # Use the Geocoding API if the city isn't in the custom cities dictionary
