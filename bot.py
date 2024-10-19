@@ -122,16 +122,19 @@ async def weather(ctx, *, city: str):
         # Get the corresponding emoji for the weather description
         weather_emoji = weather_emojis.get(weather_description.lower(), "🌍")
 
-        # Construct the weather report
-        weather_report = (
-            f"**Weather in {city_name}, {country}:**\n"
-            f"🌡️ Temperature: {temperature}°C\n"
-            f"{weather_emoji} Condition: {weather_description.capitalize()} \n"
-            f"💧 Humidity: {humidity}%\n"
-            f"🌬️ Wind Speed: {wind_speed} m/s"
+        # Create an embed for better visual
+        embed = discord.Embed(
+            title=f"Weather in {city_name}, {country}",
+            description=f"{weather_emoji} {weather_description.capitalize()}",
+            color=0x1abc9c
         )
-        # Send the weather report
-        await ctx.send(weather_report)
+        embed.add_field(name="🌡️ Temperature", value=f"{temperature}°C", inline=True)
+        embed.add_field(name="💧 Humidity", value=f"{humidity}%", inline=True)
+        embed.add_field(name="🌬️ Wind Speed", value=f"{wind_speed} m/s", inline=True)
+        embed.set_footer(text="Weather data provided by OpenWeather")
+
+        # Send the embed message
+        await ctx.send(embed=embed)
 
     except Exception as e:
         logger.error(f"Error fetching weather data: {e}")
