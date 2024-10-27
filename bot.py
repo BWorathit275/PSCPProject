@@ -121,6 +121,7 @@ async def weather(ctx, *, city: str):
         pressure = data['main']['pressure']
         last_updated = datetime.datetime.fromtimestamp(data['dt']).strftime("%Y-%m-%d %H:%M:%S")
 
+        # Create an embed for better visual
         embed = discord.Embed(
             title=f"Weather in {city_name}, {country}",
             description=f"{weather_emoji} {weather_description.capitalize()}",
@@ -134,6 +135,12 @@ async def weather(ctx, *, city: str):
         embed.add_field(name="🌫️ Pressure", value=f"{pressure} hPa", inline=True)
         embed.set_footer(text=f"Last updated: {last_updated}, provided by OpenWeather")
 
+        embed.add_field(name="🌡️ Temperature", value=f"{temperature}°C", inline=True)
+        embed.add_field(name="💧 Humidity", value=f"{humidity}%", inline=True)
+        embed.add_field(name="🌬️ Wind Speed", value=f"{wind_speed} m/s", inline=True)
+        embed.set_footer(text="Weather data provided by OpenWeather")
+
+        # Send the embed message
         await ctx.send(embed=embed)
 
     except Exception as e:
