@@ -140,6 +140,105 @@ async def weather(ctx, *, city: str):
         logger.error(f"Error fetching weather data: {e}")
         await ctx.send("Sorry, I couldn't retrieve the weather at the moment.")
 
+@client.command()
+async def forecast(ctx, *, city: str):
+    """Sends buttons for selecting hourly or 8-day forecast."""
+    if city.lower() in custom_cities:
+        lat = custom_cities[city.lower()]["lat"]
+        lon = custom_cities[city.lower()]["lon"]
+        city_name = city.title()
+    else:
+        geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
+        geocode_params = {
+            'q': city,
+            'appid': weather_api_key,
+            'limit': 1
+        }
+        geocode_response = requests.get(geocode_url, params=geocode_params)
+        geocode_data = geocode_response.json()
+
+        if not geocode_data:
+            await ctx.send("City not found. Please check the spelling or try a different city.")
+            return
+
+        lat = geocode_data[0]['lat']
+        lon = geocode_data[0]['lon']
+        city_name = geocode_data[0]['name']
+
+    button_hourly = Button(label="3-Hours", style=discord.ButtonStyle.primary)
+    button_daily = Button(label="6-Days", style=discord.ButtonStyle.secondary)
+
+    view = View()
+    view.add_item(button_hourly)
+    view.add_item(button_daily)
+
+    async def hourly_callback(interaction):
+        await send_hourly_forecast(interaction, city_name, lat, lon)
+
+    async def daily_callback(interaction):
+        await send_daily_forecast(interaction, city_name, lat, lon)
+
+    button_hourly.callback = hourly_callback
+    button_daily.callback = daily_callback
+
+    await ctx.send(f"Choose the forecast type for {city_name}:", view=view)
+
+async def send_hourly_forecast(interaction, city_name, lat, lon):
+    """Sends a 3-hour weather forecast for the next 36 hours (12 intervals)."""
+    base_url = "http://api.openweathermap.org/data/2.5/forecast"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': weather_api_key,
+        'units': 'metric'
+    }
+
+    response = requests.get(base_url, params=params)
+    data = response.json()
+
+    if response.status_code != 200:
+        await interaction.response.send_message(f"Error: {data.get('message', '')}")
+        return
+
+    forecast_list = data.get('list', [])[:12]  # Get the first 12 intervals (36 hours)
+    if not forecast_list:
+        await interaction.response.send_message("No forecast data available.")
+        return
+
+    forecast_message = f"**3-Hour Weather Forecast for {city_name}:**\n"
+    for forecast in forecast_list:
+        # Convert Unix timestamp to readable time format
+        time = datetime.datetime.fromtimestamp(forecast['dt']).strftime("%I:%M %p")
+        temp = forecast['main']['temp']
+        humidity = forecast['main']['humidity']
+        description = forecast['weather'][0]['description']
+        weather_emoji = weather_emojis.get(description.lower(), "🌍")
+        forecast_message += f"{time} - {temp}°C,  Humidity: {humidity}%, {description.capitalize()} {weather_emoji}\n"
+
+    await interaction.response.send_message(forecast_message)
+
+
+async def send_daily_forecast(interaction, city_name, lat, lon):
+    """Simulates an 8-day weather forecast using aggregated 3-hour forecast data."""
+    base_url = "http://api.openweathermap.org/data/2.5/forecast"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': weather_api_key,
+        'units': 'metric'
+    }
+
+    response = requests.get(base_url, params=params)
+    data = response.json()
+
+    if response.status_code != 200:
+        await interaction.response.send_message(f"Error: {data.get('message', '')}")
+        return
+
+    forecast_list = data.get('list', [])
+    if not forecast_list:
+        await interaction.response.send_message("No forecast data available.")
+        return
 
 # Error Handling
 @client.event
