@@ -1,7 +1,13 @@
+  -LIBRARY-
 aiohttp
 aiosqlite
 discord.py
 python-dotenv
 request
+json
+datetime
+os
+
+  -TOKEN-
 bottokenapi
 weatherapi
