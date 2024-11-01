@@ -1,5 +1,5 @@
 {
-  "weather_emojis": {
+    "weather_emojis": {
       "clear sky": "☀️",
       "few clouds": "🌤️",
       "scattered clouds": "☁️",
@@ -15,30 +15,89 @@
       "light rain": "🌧️",
       "moderate rain": "🌧️🌧️",
       "heavy rain": "🌧️🌧️🌧️"
-  },
-  "custom_cities": {
-      "bang phli": {"lat": 13.6059, "lon": 100.7061},
-      "kmitl": {"lat": 13.7289, "lon": 100.7780}
-  },
-  "statuses": [
-      "Watching the sky",
-      "Tracking weather updates",
-      "Observing☁️"
-  ],
-  "aqi_level": [
+    },
+  
+    "custom_cities": {
+      "bang phli": { "lat": 13.6059, "lon": 100.7061 },
+      "kmitl": { "lat": 13.7289, "lon": 100.7780 }
+    },
+  
+    "statuses": [
+      "tbd",
+      "tbd",
+      "tbd",
+      "tbd",
+      "tbd",
+      "tbd",
+      "tbd"
+    ],
+  
+    "aqi_levels": [
       "Good",
       "Moderate",
-      "Slighty Unhealthy",
+      "Slightly Unhealthy",
       "Unhealthy",
       "Very Unhealthy",
       "Hazardous"
-  ],
-  "aqi_color": [
+    ],
+  
+    "aqi_colors": [
       3066993,
       15988929,
       15105570,
       15158332,
       9328512,
       8206872
-  ]
-}
+    ],
+  
+    "temperature_levels": {
+      "freezing": { "max": 0, "description": "Freezing" },
+      "cold": { "min": 0.01, "max": 10, "description": "Cold" },
+      "cool": { "min": 10.01, "max": 23, "description": "Cool" },
+      "warm": { "min": 23.01, "max": 30, "description": "Warm" },
+      "hot": { "min": 30.01, "max": 40, "description": "Hot" },
+      "searing": { "min": 40.01, "description": "Searing" }
+    },
+  
+    "humidity_levels": {
+      "dry": { "max": 30, "description": "Dry" },
+      "comfortable": { "min": 30.01, "max": 60, "description": "Comfortable" },
+      "humid": { "min": 60.01, "max": 80, "description": "Humid" },
+      "very_humid": { "min": 80.01, "description": "Very Humid" }
+    },
+  
+    "wind_levels": {
+      "calm": { "max": 1.5, "description": "Calm" },
+      "light_breeze": { "min": 1.51, "max": 5.5, "description": "Light Breeze" },
+      "moderate_breeze": { "min": 5.51, "max": 10.8, "description": "Moderate Breeze" },
+      "strong_wind": { "min": 10.81, "max": 17.2, "description": "Strong Wind" },
+      "very_strong_wind": { "min": 17.21, "description": "Very Strong Wind" }
+    },
+  
+    "uv_levels": {
+      "low": { "max": 2, "description": "Low" },
+      "moderate": { "min": 2.01, "max": 5, "description": "Moderate" },
+      "high": { "min": 5.01, "max": 7, "description": "High" },
+      "very_high": { "min": 7.01, "max": 10, "description": "Very High" },
+      "extreme": { "min": 10.01, "description": "Extreme" }
+    },
+  
+    "warnings": {
+      "tempcold": "Stay indoors and keep warm.",
+      "temphot": "Stay hydrated and avoid prolonged outdoor activities.",
+      "humidity": "High humidity may cause discomfort. Consider staying indoors.",
+      "wind_speed": "Strong winds expected. Secure outdoor objects and avoid high areas.",
+      "uv_index": "High UV levels detected. Wear protective clothing.",
+      "aqi": "Unhealthy Air Quality detected. Consider wearing a mask outdoors."
+    },
+  
+    "rain_levels": {
+      "no_rain": { "max": 0, "description": "No Rain" },
+      "light_rain": { "min": 0.1, "max": 2.5, "description": "Light Rain" },
+      "moderate_rain": { "min": 2.5, "max": 7.5, "description": "Moderate Rain" },
+      "heavy_rain": { "min": 7.5, "max": 50, "description": "Heavy Rain" },
+      "very_heavy_rain": { "min": 50, "max": 100, "description": "Very Heavy Rain" },
+      "extreme_rain": { "min": 100, "description": "Extreme Rain" }
+    }
+  }
+  
