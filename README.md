@@ -7,7 +7,7 @@ DiscordBot
 ✅ Foundation 
 ✅ Secure API
 ⚠️ Implement !weather
-❌ Implement !forecast
+⚠️ Implement !forecast
 ❌ Implement !stormtrack (optional)
 
 !weather
@@ -18,20 +18,26 @@ DiscordBot
 ✅ Humidity 
 ✅ Wind Speed
 ⚠️ Designing Output
-⚠️ Feels Like Temperature 
-⚠️ Moving Dict to external config
+✅ Feels Like Temperature 
 ✅  Adding additional city via latitude/longitude (for adding non included place in openweather database like Bang Phli / KMITL)
-❌ Implement Highest/Lowest to Temp 
+✅ Implement Highest/Lowest to Temp 
 ❌ Rain Amount 
 
 !forecast
-❌ Foundation 
+✅ Foundation 
 ✅ Secure API
-❌ Designing Output
-❌ 24 Hour Forecast Option
-❌ 3 Days Forecast Option
-❌ 7 Days Forecast Option
-❌ TBD 
+⚠️ Designing Output
+✅ 3-Hour Interval Forecast Option
+✅ 6 Days Forecast Option
+TBD 
 
 !stormtack
-❌ TBD
+❌ Foundation
+❌ Get API
+❌ Show Current Active Tropical Storm
+❌ Designing Output
+
+qol stuff
+⚠️ Moving Dict to external config
+❌ get bot to run 24/7
+⚠️ fix pep8 related code problem
