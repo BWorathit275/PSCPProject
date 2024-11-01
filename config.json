@@ -1,4 +1,23 @@
 {
-    "prefix": "!",
-    "invite_link": "YOUR_BOT_INVITE_LINK_HERE"
+  "weather_emojis": {
+      "clear sky": "☀️",
+      "few clouds": "🌤️",
+      "scattered clouds": "☁️",
+      "broken clouds": "⛅",
+      "shower rain": "🌧️",
+      "rain": "🌦️",
+      "thunderstorm": "⛈️",
+      "snow": "❄️",
+      "mist": "🌫️",
+      "haze": "🌫️",
+      "overcast clouds": "☁️",
+      "fog": "🌫️",
+      "light rain": "🌧️",
+      "moderate rain": "🌧️🌧️",
+      "heavy rain": "🌧️🌧️🌧️"
+  },
+  "custom_cities": {
+      "bang phli": {"lat": 13.6059, "lon": 100.7061},
+      "kmitl": {"lat": 13.7289, "lon": 100.7780}
   }
+}
