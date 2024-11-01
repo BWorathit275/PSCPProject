@@ -19,5 +19,26 @@
   "custom_cities": {
       "bang phli": {"lat": 13.6059, "lon": 100.7061},
       "kmitl": {"lat": 13.7289, "lon": 100.7780}
-  }
+  },
+  "statuses": [
+      "Watching the sky",
+      "Tracking weather updates",
+      "Observing☁️"
+  ],
+  "aqi_level": [
+      "Good",
+      "Moderate",
+      "Slighty Unhealthy",
+      "Unhealthy",
+      "Very Unhealthy",
+      "Hazardous"
+  ],
+  "aqi_color": [
+      3066993,
+      15988929,
+      15105570,
+      15158332,
+      9328512,
+      8206872
+  ]
 }
