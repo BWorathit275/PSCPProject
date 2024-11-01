@@ -17,11 +17,15 @@ DiscordBot
 ✅ Temperature 
 ✅ Humidity 
 ✅ Wind Speed
-⚠️ Designing Output
+✅ Designing Output
 ✅ Feels Like Temperature 
 ✅  Adding additional city via latitude/longitude (for adding non included place in openweather database like Bang Phli / KMITL)
 ✅ Implement Highest/Lowest to Temp 
-❌ Rain Amount 
+✅ Rain Amount 
+✅ UV Index
+✅ AQI
+✅ Warning System
+✅ Varied Level of data description
 
 !forecast
 ✅ Foundation 
@@ -38,6 +42,6 @@ TBD
 ❌ Designing Output
 
 qol stuff
-⚠️ Moving Dict to external config
+✅ Moving Dict to external config
 ❌ get bot to run 24/7
 ⚠️ fix pep8 related code problem
