@@ -1,5 +1,5 @@
 ## PSCPProject  
-# -- WEATHERBOT --
+# -- SKYWATCHER --
 # RoadMap
 DiscordBot
 ✅ Logging system
