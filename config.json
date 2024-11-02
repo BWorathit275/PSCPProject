@@ -83,9 +83,9 @@
     },
   
     "warnings": {
-      "tempcold": "Stay indoors and keep warm.",
-      "temphot": "Stay hydrated and avoid prolonged outdoor activities.",
-      "humidity": "High humidity may cause discomfort. Consider staying indoors.",
+      "tempcold": "Low temperature level detected. Stay indoors and keep warm.",
+      "temphot": "High temperature level detected. Stay hydrated and avoid prolonged outdoor activities.",
+      "humidity": "High humidity level detected. Consider staying indoors.",
       "wind_speed": "Strong winds expected. Secure outdoor objects and avoid high areas.",
       "uv_index": "High UV levels detected. Wear protective clothing.",
       "aqi": "Unhealthy Air Quality detected. Consider wearing a mask outdoors."
