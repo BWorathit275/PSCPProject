@@ -249,6 +249,7 @@ async def forecast(ctx, *, city: str):
 
     await ctx.send(f"Choose the forecast type for {city_name}:", view=view)
 
+#new forecast command
 async def send_hourly_forecast(interaction, city_name, lat, lon):
     """Sends a 3-hour weather forecast for the next 36 hours (12 intervals)."""
     base_url = "http://api.openweathermap.org/data/2.5/forecast"
@@ -259,31 +260,57 @@ async def send_hourly_forecast(interaction, city_name, lat, lon):
         'units': 'metric'
     }
 
-    response = requests.get(base_url, params=params)
+    response = requests.get(base_url, params=params, timeout=10)
     data = response.json()
 
     if response.status_code != 200:
         await interaction.response.send_message(f"Error: {data.get('message', '')}")
         return
 
-    forecast_list = data.get('list', [])[:12]  # Get the first 12 intervals (36 hours)
+    forecast_list = data.get('list', [])[:9]  # Only retrieve the next 24 hours
     if not forecast_list:
         await interaction.response.send_message("No forecast data available.")
         return
 
-    forecast_message = f"**3-Hour Weather Forecast for {city_name}:**\n"
+    # Create an embed for the hourly forecast
+    embed = discord.Embed(
+        title=f"**3-Hour Weather Forecast for {city_name}:**",
+        color=0x1abc9c
+    )
+
     for forecast in forecast_list:
-        # Convert Unix timestamp to readable time format
-        time = datetime.datetime.fromtimestamp(forecast['dt'])\
-.strftime("%I:%M %p")
+        dt = datetime.datetime.fromtimestamp(forecast['dt']).strftime("%b %d, %H:%M")
         temp = forecast['main']['temp']
+        feels_like = forecast['main'].get('feels_like')
         humidity = forecast['main']['humidity']
         description = forecast['weather'][0]['description']
+        wind_speed = forecast['wind']['speed']
+        cloud_cover = forecast.get('clouds', {}).get('all', 0)
+        pop = int(forecast.get('pop', 0) * 100)
+        rain_amount = forecast.get('rain', {}).get('3h', 0)  # Rain over 3-hour period
         weather_emoji = weather_emojis.get(description.lower(), "🌍")
-        forecast_message += f"{time} - {temp}°C,  Humidity: {humidity}%, {description.capitalize()} {weather_emoji}\n"
 
-    await interaction.response.send_message(forecast_message)
+        # Levels and descriptions
+        temp_level = get_level(temp, config["temperature_levels"])
+        humidity_level = get_humidity_level(humidity)
+        wind_level = get_wind_level(wind_speed)
+        rain_level = get_rain_level(rain_amount)
 
+        embed.add_field(
+            name=f"{dt}",
+            value=(
+                f"{weather_emoji} {description.title()}\n"
+                f"🌡️ Temp: {temp}°C (Feels like {feels_like} °C) ({temp_level})\n"
+                f"💧 Humidity: {humidity}% ({humidity_level})\n"
+                f"🌬️ Wind: {wind_speed} m/s ({wind_level})\n"
+                f"☁️ Cloud Cover: {cloud_cover}%\n"
+                f"🌧️ Precipitation: {pop}%\n"
+                f"🌧️ Rain Amount: {rain_amount} mm ({rain_level})"
+            ),
+            inline=False
+        )
+
+    await interaction.response.send_message(embed=embed)
 
 async def send_daily_forecast(interaction, city_name, lat, lon):
     """Simulates an 8-day weather forecast using aggregated 3-hour forecast data."""
