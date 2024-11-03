@@ -6,9 +6,9 @@ DiscordBot
 ✅ Error handling system 
 ✅ Foundation 
 ✅ Secure API
-⚠️ Implement !weather
+✅ Implement !weather
 ⚠️ Implement !forecast
-❌ Implement !stormtrack (optional)
+⚠️ Implement !hurricane
 
 !weather
 ✅ Foundation 
@@ -35,11 +35,11 @@ DiscordBot
 ✅ 6 Days Forecast Option
 TBD 
 
-!stormtack
-❌ Foundation
-❌ Get API
-❌ Show Current Active Tropical Storm
-❌ Designing Output
+!hurricane
+✅ Foundation
+✅ Download Dependencies for tropycal
+✅ Show Hurricane Data (Pre-2024)
+⚠️ Designing Output
 
 qol stuff
 ✅ Moving Dict to external config
