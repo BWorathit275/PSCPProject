@@ -1,13 +1,23 @@
   -LIBRARY-
-aiohttp
-aiosqlite
 discord.py
 python-dotenv
 request
 json
 datetime
 os
+tropycal
 
+--tropycal Dependencies--
+Cartopy
+shapely 
+matplotlib
+numpy
+scipy 
+pandas
+xarray
+networkx
+
+pyshp
   -TOKEN-
 bottokenapi
 weatherapi
