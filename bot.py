@@ -414,6 +414,93 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
 
     await interaction.response.send_message(embed=embed)
 
+import matplotlib.pyplot as plt
+import tropycal.tracks as tracks
+
+basin = tracks.TrackDataset(basin='north_atlantic')
+
+@client.command()
+async def hurricane(ctx, *, storm_name_year: str):
+    """
+    Command to retrieve and display information about a tropical cyclone.
+    Usage: !hurricane [Storm Name] [Year]
+    Example: !hurricane Dorian 2019
+    """
+    try:
+        storm_name, year = storm_name_year.split()
+        year = int(year)
+
+        # Retrieve specific storm by name and year
+        storm = basin.get_storm((storm_name, year))
+
+        # Check if storm data was found
+        if not storm:
+            await ctx.send(f"Storm '{storm_name} {year}' not found in the data.")
+            return
+
+        # Get basic storm information from the dictionary structure
+        max_wind = max(storm.dict['vmax'])  # Max wind speed in knots
+        min_pressure = min(storm.dict['mslp'])  # Min pressure in hPa
+        start_date = storm.dict['time'][0].strftime("%Y-%m-%d")
+        end_date = storm.dict['time'][-1].strftime("%Y-%m-%d")
+        # Calculate storm duration
+        duration_days = (storm.dict['time'][-1] - storm.dict['time'][0]).days
+
+        # Calculate ACE
+        ace = storm.dict.get('ace', "N/A")
+
+        # Determine storm category based on max wind speed
+        category = "Tropical Depression" if max_wind < 39 else \
+                "Tropical Storm" if max_wind < 74 else \
+                "Hurricane" if max_wind < 113 else \
+                "Major Hurricane"
+
+        # Format the storm track information
+        track_message = "\n".join([
+            f"Time: {time.strftime('%Y-%m-%d %H:%M')}, Lat: {lat}, Lon: {lon}, Wind: {vmax} knots"
+            for time, lat, lon, vmax in zip(storm.dict['time'], storm.dict['lat']\
+, storm.dict['lon'], storm.dict['vmax'])
+        ])
+
+        # Create an embed to display storm information
+        embed = discord.Embed(
+            title=f"🌀 Hurricane Info: {storm_name.capitalize()} {year}",
+            description=f"Start Date: {start_date}\nEnd Date: {end_date}",
+            color=0x3498db
+        )
+        embed.add_field(name="Category", value=category, inline=True)
+        embed.add_field(name="Duration", value=f"{duration_days} days", inline=True)
+        embed.add_field(name="Accumulated Cyclone Energy (ACE)", value=f"{ace}", inline=True)
+        embed.add_field(name="Max Wind Speed", value=f"{max_wind} knots", inline=True)
+        embed.add_field(name="Min Pressure", value=f"{min_pressure} hPa", inline=True)
+        embed.add_field(name="Storm Track", value=track_message[:0], inline=False)
+
+        # Plot the storm track and save the image
+        plt.figure()
+        storm.plot(
+        domain="dynamic",
+        title=f"Track of {storm_name.capitalize()} ({year})",
+        plot_all_dots=True,
+        color="category"
+        )
+        image_path = f"{storm_name}_{year}_track.png"
+        plt.savefig(image_path, bbox_inches='tight')  # Save the plot to a file
+        plt.close()  # Close the plot to free up memory
+
+        # Send the embed
+        await ctx.send(embed=embed)
+        await ctx.send(file=discord.File(image_path))
+
+    except ValueError:
+        await ctx.send("Provide the storm name and year in the format: !hurricane [Storm Name] [Year]")
+    except Exception as e:
+        logger.error(f"Error retrieving cyclone data: {e}")
+        await ctx.send("An error occurred")
+    finally:
+        # Clean up image file
+        if os.path.exists(image_path):
+            os.remove(image_path)
+            
 # Error Handling
 @client.event
 async def on_command_error(ctx, error):
