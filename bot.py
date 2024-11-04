@@ -361,6 +361,79 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
 
     await interaction.response.send_message(forecast_message)
 
+async def send_daily_forecast(interaction, city_name, lat, lon):
+    """Simulates an 6-day weather forecast using aggregated 3-hour forecast data."""
+    base_url = "http://api.openweathermap.org/data/2.5/forecast"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': weather_api_key,
+        'units': 'metric'
+    }
+
+    response = requests.get(base_url, params=params, timeout=10)
+    data = response.json()
+
+    if response.status_code != 200:
+        await interaction.response.send_message(f"Error: {data.get('message', '')}")
+        return
+
+    forecast_list = data.get('list', [])
+    if not forecast_list:
+        await interaction.response.send_message("No forecast data available.")
+        return
+
+    # Group data by day and calculate daily statistics
+    daily_data = {}
+    for forecast in forecast_list:
+        date = datetime.datetime.fromtimestamp(forecast['dt']).strftime("%B %d, %Y")
+        temp = forecast['main']['temp']
+        humidity = forecast['main']['humidity']
+        description = forecast['weather'][0]['description']
+        rain_amount = forecast.get('rain', {}).get('3h', 0)
+
+        if date not in daily_data:
+            daily_data[date] = {'temps': [], 'humidities': [], 'descriptions': [], 'rain': []}
+
+        daily_data[date]['temps'].append(temp)
+        daily_data[date]['humidities'].append(humidity)
+        daily_data[date]['descriptions'].append(description)
+        daily_data[date]['rain'].append(rain_amount)
+
+    # Create an embed for the daily forecast
+    embed = discord.Embed(
+        title=f"**6-Day Weather Forecast for {city_name}:**",
+        color=0x1abc9c
+    )
+
+    for date, values in list(daily_data.items())[:6]:  # Limit to 6 days
+        min_temp = min(values['temps'])
+        max_temp = max(values['temps'])
+        avg_humidity = sum(values['humidities']) // len(values['humidities'])
+        total_rain = sum(values['rain'])
+
+        # Use the most common description for the day
+        description = max(set(values['descriptions']), key=values['descriptions'].count)
+        weather_emoji = weather_emojis.get(description.lower(), "🌍")
+
+        # Levels
+        temp_level = get_level(max_temp, config["temperature_levels"])
+        humidity_level = get_humidity_level(avg_humidity)
+        rain_level = get_rain_level(total_rain)
+
+        embed.add_field(
+            name=f"{date}",
+            value=(
+                f"{weather_emoji} {description.title()}\n"
+                f"🌡️ High: {max_temp}°C ({temp_level}), Low: {min_temp}°C\n"
+                f"💧 Avg Humidity: {avg_humidity}% ({humidity_level})\n"
+                f"🌧️ Total Rain: {total_rain} mm ({rain_level})"
+            ),
+            inline=False
+        )
+
+    await interaction.response.send_message(embed=embed)
+
 # Error Handling
 @client.event
 async def on_command_error(ctx, error):
