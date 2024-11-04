@@ -126,7 +126,7 @@ async def weather(ctx, *, city: str):
             'appid': weather_api_key,
             'limit': 1
         }
-        geocode_response = requests.get(geocode_url, params=geocode_params)
+        geocode_response = requests.get(geocode_url, params=geocode_params, timeout=10)
         geocode_data = geocode_response.json()
 
         if not geocode_data:
@@ -147,7 +147,7 @@ async def weather(ctx, *, city: str):
 
     try:
         # Main weather data
-        response = requests.get(base_url, params=params)
+        response = requests.get(base_url, params=params, timeout=10)
         data = response.json()
 
         if data.get('cod') != 200:
@@ -170,13 +170,13 @@ async def weather(ctx, *, city: str):
 
         # UV Index
         uvi_params = {'lat': lat, 'lon': lon, 'appid': weather_api_key}
-        uvi_response = requests.get(uvi_url, params=uvi_params)
+        uvi_response = requests.get(uvi_url, params=uvi_params, timeout=10)
         uvi_data = uvi_response.json()
         uv_index = uvi_data.get('value', "N/A")
 
         # Air Quality Index
         aqi_params = {'lat': lat, 'lon': lon, 'appid': weather_api_key}
-        aqi_response = requests.get(aqi_url, params=aqi_params)
+        aqi_response = requests.get(aqi_url, params=aqi_params, timeout=10)
         aqi_data = aqi_response.json()
         aqi = aqi_data.get('list', [{}])[0].get('main', {}).get('aqi', "N/A")
 
@@ -249,7 +249,7 @@ async def forecast(ctx, *, city: str):
             'appid': weather_api_key,
             'limit': 1
         }
-        geocode_response = requests.get(geocode_url, params=geocode_params)
+        geocode_response = requests.get(geocode_url, params=geocode_params, timeouy=10)
         geocode_data = geocode_response.json()
 
         if not geocode_data:
@@ -351,7 +351,7 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
         'units': 'metric'
     }
 
-    response = requests.get(base_url, params=params)
+    response = requests.get(base_url, params=params, timeout=10)
     data = response.json()
 
     if response.status_code != 200:
