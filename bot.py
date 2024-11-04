@@ -6,6 +6,8 @@ import random
 import datetime
 import requests
 import json
+import matplotlib.pyplot as plt
+import tropycal.tracks as tracks
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 from dotenv import load_dotenv
@@ -413,9 +415,6 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
         )
 
     await interaction.response.send_message(embed=embed)
-
-import matplotlib.pyplot as plt
-import tropycal.tracks as tracks
 
 basin = tracks.TrackDataset(basin='north_atlantic')
 
