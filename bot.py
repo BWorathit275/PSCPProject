@@ -80,6 +80,35 @@ async def on_ready():
     status_task.start()
 
 @client.command()
+async def city(ctx):
+    """Shows available custom cities."""
+    cities_list = ""
+    for cityc in config["custom_cities"].keys():
+        cities_list += f"{cityc.title()}\n"
+
+    embed = discord.Embed(
+        title="Available Custom Cities",
+        description=cities_list,
+        color=0x1abc9c
+    )
+
+    await ctx.send(embed=embed)
+@client.command()
+async def cmds(ctx):
+    """Provides a list of available bot commands and their functions."""
+    commands_list = ""
+    for command, description in config["commands"].items():
+        commands_list += f"!{command} - {description}\n"
+
+    embed = discord.Embed(
+        title="Available Commands",
+        description=commands_list,
+        color=0x1abc9c
+    )
+
+    await ctx.send(embed=embed)
+
+@client.command()
 async def weather(ctx, *, city: str):
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     aqi_url = "http://api.openweathermap.org/data/2.5/air_pollution"
