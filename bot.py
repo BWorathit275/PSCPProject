@@ -45,9 +45,9 @@ def get_weather_data(url, params):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
-        logger.error(f"HTTP error occurred: {http_err}")
+        logger.error("HTTP error occurred: %s", http_err)
     except requests.exceptions.RequestException as req_err:
-        logger.error(f"Request error occurred: {req_err}")
+        logger.error("Request error occurred: %s", req_err)
     return None
 
 def get_level(value, levels):
@@ -425,7 +425,7 @@ async def hurricane(ctx, *, storm_name_year: str):
         await ctx.send("Provide the storm name and year in the format:\
 !hurricane [Storm Name] [Year]")
     except KeyError as e:
-        logger.error(f"Error retrieving cyclone data: {e}")
+        logger.error("Error retrieving cyclone data: %s", e)
         await ctx.send("An error occurred")
     finally:
         # Clean up image file
