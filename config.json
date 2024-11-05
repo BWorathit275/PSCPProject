@@ -102,8 +102,10 @@
     "commands": {
       "weather": "Get current weather for the specified city, with details on temperature, humidity, wind speed, UV index, rain levels, and air quality. Usage: !weather [city]",
       "forecast": "Provides a 3-hour interval forecast or a 6-day forecast for the specified city, displaying temperature, humidity, and conditions. Usage: !forecast [city]",
-      "hurricane": "Retrieve information about a specific tropical cyclone, including storm duration, category, ACE, max wind speed, and track visualization. Usage: !hurricane [Storm Name] [Year].",
-      "shutdown": "(Owner only) Shuts down the bot."
+      "hurricane": "Retrieve information about a specific tropical cyclone, including storm duration, category, ACE, max wind speed, and track visualization. Usage: !hurricane [Storm Name] [Year]. NOTE: Data is PRE-2024",
+      "shutdown": "(Owner only) Shuts down the bot.",
+      "city" : "Show custom cities that can be used with !weather"
+
     }
   }
   
