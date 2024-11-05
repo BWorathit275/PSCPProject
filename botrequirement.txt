@@ -6,10 +6,10 @@ json
 datetime
 os
 tropycal
-
---tropycal Dependencies--
 Cartopy
 shapely 
+
+--tropycal Dependencies-- (will come with tropycal)
 matplotlib
 numpy
 scipy 
