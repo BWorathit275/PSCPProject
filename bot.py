@@ -95,7 +95,7 @@ async def on_ready():
     status_task.start()
 
 @client.command()
-async def city(ctx):
+async def custom_city(ctx):
     """Displays available custom cities."""
     cities_list = "\n".join([city.title() for city in config["custom_cities"]])
     embed = discord.Embed(
@@ -222,7 +222,7 @@ async def weather(ctx, *, city: str):
     await ctx.send(embed=embed)
 
 @client.command()
-async def forecast(ctx, *, city: str):
+async def main_forecast(ctx, *, city: str):
     """Provides buttons for hourly or 6-day forecast."""
     geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
     geocode_params = {'q': city, 'appid': weather_api_key, 'limit': 1}
@@ -424,7 +424,7 @@ async def hurricane(ctx, *, storm_name_year: str):
     except ValueError:
         await ctx.send("Provide the storm name and year in the format:\
 !hurricane [Storm Name] [Year]")
-    except Exception as e:
+    except KeyError as e:
         logger.error(f"Error retrieving cyclone data: {e}")
         await ctx.send("An error occurred")
     finally:
