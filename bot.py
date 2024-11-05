@@ -52,7 +52,7 @@ def get_weather_data(url, params):
 
 def get_level(value, levels):
     """Determine level based on configuration thresholds."""
-    for level, bounds in levels.items():
+    for _, bounds in levels.items():
         min_val = bounds.get('min', float('-inf'))
         max_val = bounds.get('max', float('inf'))
         if min_val <= value <= max_val:
