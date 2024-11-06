@@ -12,11 +12,7 @@
 
 ## Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/SKYWATCHER.git
-   cd SKYWATCHER
-   ```
+1. **Clone the repository**
 
 2. **Set up a virtual environment** (optional but recommended):
    ```bash
