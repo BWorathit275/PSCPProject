@@ -458,7 +458,7 @@ async def send_daily_forecast(interaction, city_name, lat=None, lon=None):
         len(daily_data[day]['pop']) for day in dates]
 
     # Create the figure with subplots to separate temperature and rain data
-    (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
     # Subplot 1: Temperature (Min, Max, Feels-Like)
     ax1.bar(dates, max_temps, color='#FF4500', alpha=0.7, label='Max Temperature (°C)', width=0.4)
