@@ -149,8 +149,8 @@ async def weather(interaction, *, city: str):
     params = {'lat': lat, 'lon': lon, 'appid': weather_api_key, 'units': 'metric'}
     data = get_weather_data(base_url, params)
     if not data or data.get('cod') != 200:
-        await interaction.response.send_message(f"Error: {data.get('message', '\
-            Could not retrieve weather data.')}")
+        await interaction.response.send_message\
+            (f"Error: {data.get('message', 'Could not retrieve weather data.')}")
         return
 
     # Process data
@@ -237,19 +237,26 @@ async def weather(interaction, *, city: str):
 @client.tree.command()
 async def main_forecast(interaction, *, city: str):
     """Provides buttons for hourly or 6-day forecast."""
-    geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
-    geocode_params = {'q': city, 'appid': weather_api_key, 'limit': 1}
-    geocode_data = get_weather_data(geocode_url, geocode_params)
+    if city.lower() in custom_cities:
+        lat = custom_cities[city.lower()]["lat"]
+        lon = custom_cities[city.lower()]["lon"]
+        city_name = city.title()
+    else:
+        # Geocode the city if it's not in custom cities
+        geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
+        geocode_params = {'q': city, 'appid': weather_api_key, 'limit': 1}
+        geocode_data = get_weather_data(geocode_url, geocode_params)
 
-    if not geocode_data:
-        await interaction.response.send_message("City not found. Please check the\
-            spelling or try a different city.")
-        return
+        if not geocode_data:
+            await interaction.response.send_message("City not found. \
+                Please check the spelling or try a different city.")
+            return
 
-    lat = geocode_data[0]['lat']
-    lon = geocode_data[0]['lon']
-    city_name = geocode_data[0]['name']
+        lat = geocode_data[0]['lat']
+        lon = geocode_data[0]['lon']
+        city_name = geocode_data[0]['name']
 
+    # Create buttons for hourly or daily forecasts
     button_hourly = Button(label="3-Hours", style=discord.ButtonStyle.primary)
     button_daily = Button(label="6-Days", style=discord.ButtonStyle.secondary)
 
@@ -268,9 +275,24 @@ async def main_forecast(interaction, *, city: str):
 
     await interaction.response.send_message(f"Choose the forecast type for {city_name}:", view=view)
 
-async def send_hourly_forecast(interaction, city_name, lat, lon):
+async def send_hourly_forecast(interaction, city_name, lat=None, lon=None):
     """Displays 3-hour weather forecast for the next 36 hours."""
     base_url = "http://api.openweathermap.org/data/2.5/forecast"
+
+    if lat is None or lon is None:
+        geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
+        geocode_params = {'q': city_name, 'appid': weather_api_key, 'limit': 1}
+        geocode_data = get_weather_data(geocode_url, geocode_params)
+
+        if not geocode_data:
+            await interaction.response.send_message("City not found. \
+                Please check the spelling or try a different city.")
+            return
+
+        lat = geocode_data[0]['lat']
+        lon = geocode_data[0]['lon']
+        city_name = geocode_data[0]['name']
+
     params = {'lat': lat, 'lon': lon, 'appid': weather_api_key, 'units': 'metric'}
 
     data = get_weather_data(base_url, params)
@@ -278,41 +300,120 @@ async def send_hourly_forecast(interaction, city_name, lat, lon):
         await interaction.response.send_message("Error fetching forecast data.")
         return
 
+    forecast_list = data.get('list', [])[:12]
+
+    times = []
+    temps = []
+    feels_like_temps = []
+    humidities = []
+    wind_speeds = []
+    rain_amounts = []
+    pops = []
+
     embed = discord.Embed(
-        title=f"**3-Hour Weather Forecast for {city_name}:**",
+        title=f"**Hourly Weather Forecast for {city_name}:**",
+        description="Here is the detailed weather forecast for the next 36 hours.",
         color=0x1abc9c
     )
 
-    for forecast in data.get('list', [])[:12]:
+    for forecast in forecast_list:
         dt = datetime.datetime.fromtimestamp(forecast['dt']).strftime("%b %d, %H:%M")
         temp = forecast['main']['temp']
-        feels_like = forecast['main'].get('feels_like')
+        feels_like = forecast['main']['feels_like']
         humidity = forecast['main']['humidity']
-        description = forecast['weather'][0]['description']
         wind_speed = forecast['wind']['speed']
         cloud_cover = forecast.get('clouds', {}).get('all', 0)
         pop = int(forecast.get('pop', 0) * 100)
         rain_amount = forecast.get('rain', {}).get('3h', 0)
+        description = forecast['weather'][0]['description']
         weather_emoji = weather_emojis.get(description.lower(), "🌍")
 
+        # Store data for plotting
+        times.append(dt)
+        temps.append(temp)
+        feels_like_temps.append(feels_like)
+        humidities.append(humidity)
+        wind_speeds.append(wind_speed)
+        rain_amounts.append(rain_amount)
+        pops.append(pop)
+
         embed.add_field(
-            name=f"{dt}",
-            value=(f"{weather_emoji} {description.title()}\n"
-                   f"🌡️ Temp: {temp}°C (Feels like {feels_like}°C) \
-({get_level(temp, config['temperature_levels'])})\n"
-                   f"💧 Humidity: {humidity}% ({get_humidity_level(humidity)})\n"
-                   f"🌬️ Wind: {wind_speed} m/s ({get_wind_level(wind_speed)})\n"
-                   f"☁️ Cloud Cover: {cloud_cover}%\n"
-                   f"🌧️ Precipitation: {pop}%\n"
-                   f"🌧️ Rain Amount: {rain_amount} mm ({get_rain_level(rain_amount)})"),
+            name=f"{dt} - {weather_emoji} {description.title()}",
+            value=(
+                f"🌡️ **Temp**: {temp:.2f}°C (Feels like **{feels_like:.2f}°C**)\n"
+                f"💧 **Humidity**: {humidity}%\n"
+                f"🌬️ **Wind Speed**: {wind_speed:.2f} m/s\n"
+                f"☁️ **Cloud Cover**: {cloud_cover}%\n"
+                f"🌧️ **Precipitation**: {pop}%\n"
+                f"🌧️ **Rain Amount**: {rain_amount} mm\n"
+                f"---"
+            ),
             inline=False
         )
 
-    await interaction.response.send_message(embed=embed)
+    # Generate the graph for the forecast
+    fig, ax1 = plt.subplots(figsize=(14, 7))
 
-async def send_daily_forecast(interaction, city_name, lat, lon):
-    """Displays a 6-day weather forecast."""
+    # Plot temperature and feels-like temperature
+    ax1.plot(times, temps, marker='o', color='red', label='Temperature (°C)')
+    ax1.plot(times, feels_like_temps, marker='x', color='orange', linestyle='--', \
+        label='Feels Like (°C)')
+    ax1.set_ylabel('Temperature (°C)', color='red')
+    ax1.tick_params(axis='y', labelcolor='red')
+
+    # Plot rain probability and rain amount as bars
+    ax1.bar(times, pops, alpha=0.2, color='cyan', label='Rain Probability (%)', width=0.5)
+    ax1.bar(times, rain_amounts, alpha=0.4, color='blue', label='Rain Amount (mm)', width=0.3)
+
+    # Create a secondary axis for humidity and wind speed
+    ax2 = ax1.twinx()
+    ax2.plot(times, humidities, marker='^', linestyle='--', color='blue', label='Humidity (%)')
+    ax2.plot(times, wind_speeds, marker='s', linestyle='-', color='green', label='Wind Speed (m/s)')
+    ax2.set_ylabel('Humidity (%) / Wind Speed (m/s)', color='blue')
+    ax2.tick_params(axis='y', labelcolor='blue')
+
+    # Adjust x-axis labels to avoid overlapping
+    plt.xticks(rotation=45, ha="right", fontsize=10)
+
+    # Title and legend adjustments for better visibility
+    plt.title(f"Hourly Weather Forecast for the Next 36 Hours in {city_name}", fontsize=16)
+    fig.legend(loc='upper center', bbox_to_anchor=(0.5, 1.12), fontsize=10, ncol=3)
+
+    # Add a grid for better readability
+    ax1.grid(visible=True, which='both', linestyle='--', linewidth=0.5)
+
+    image_path = f"{city_name}_hourly_forecast.png"
+    plt.tight_layout()
+    plt.savefig(image_path, bbox_inches='tight')
+    plt.close()
+
+    embed.set_image(url="attachment://" + image_path)
+
+    await interaction.response.send_message(embed=embed, file=discord.File(image_path))
+
+    # Clean up the saved image
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+
+async def send_daily_forecast(interaction, city_name, lat=None, lon=None):
+    """Displays a 6-day weather forecast with enhanced visualization for better readability."""
     base_url = "http://api.openweathermap.org/data/2.5/forecast"
+
+    if lat is None or lon is None:
+        geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
+        geocode_params = {'q': city_name, 'appid': weather_api_key, 'limit': 1}
+        geocode_data = get_weather_data(geocode_url, geocode_params)
+
+        if not geocode_data:
+            await interaction.response.send_message("City not found. \
+                Please check the spelling or try a different city.")
+            return
+
+        lat = geocode_data[0]['lat']
+        lon = geocode_data[0]['lon']
+        city_name = geocode_data[0]['name']
+
     params = {'lat': lat, 'lon': lon, 'appid': weather_api_key, 'units': 'metric'}
     data = get_weather_data(base_url, params)
 
@@ -320,46 +421,121 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
         await interaction.response.send_message("Error fetching forecast data.")
         return
 
+    # Extract daily data
     daily_data = {}
     for forecast in data.get('list', []):
         date = datetime.datetime.fromtimestamp(forecast['dt']).strftime("%B %d, %Y")
         temp = forecast['main']['temp']
+        feels_like = forecast['main']['feels_like']
         humidity = forecast['main']['humidity']
-        description = forecast['weather'][0]['description']
+        wind_speed = forecast['wind']['speed']
         rain_amount = forecast.get('rain', {}).get('3h', 0)
+        pop = forecast.get('pop', 0) * 100
 
         if date not in daily_data:
-            daily_data[date] = {'temps': [], 'humidities': [], 'descriptions': [], 'rain': []}
+            daily_data[date] = {'temps': [], 'feels_like': [], \
+                'humidities': [], 'wind_speeds': [], 'rain': [], 'pop': []}
 
         daily_data[date]['temps'].append(temp)
+        daily_data[date]['feels_like'].append(feels_like)
         daily_data[date]['humidities'].append(humidity)
-        daily_data[date]['descriptions'].append(description)
+        daily_data[date]['wind_speeds'].append(wind_speed)
         daily_data[date]['rain'].append(rain_amount)
+        daily_data[date]['pop'].append(pop)
+
+    # Prepare data for the next 6 days
+    dates = list(daily_data.keys())[:6]
+    min_temps = [min(daily_data[day]['temps']) for day in dates]
+    max_temps = [max(daily_data[day]['temps']) for day in dates]
+    avg_feels_like = [sum(daily_data[day]['feels_like']) / \
+        len(daily_data[day]['feels_like']) for day in dates]
+    avg_humidity = [sum(daily_data[day]['humidities']) / \
+        len(daily_data[day]['humidities']) for day in dates]
+    avg_wind_speed = [sum(daily_data[day]['wind_speeds']) / \
+        len(daily_data[day]['wind_speeds']) for day in dates]
+    total_rain = [sum(daily_data[day]['rain']) for day in dates]
+    avg_pop = [sum(daily_data[day]['pop']) / \
+        len(daily_data[day]['pop']) for day in dates]
+
+    # Create the figure with subplots to separate temperature and rain data
+    (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
+
+    # Subplot 1: Temperature (Min, Max, Feels-Like)
+    ax1.bar(dates, max_temps, color='#FF4500', alpha=0.7, label='Max Temperature (°C)', width=0.4)
+    ax1.bar(dates, min_temps, color='#FFA500', alpha=0.7, label='Min Temperature (°C)', width=0.4)
+    ax1.plot(dates, avg_feels_like, marker='o', linestyle='--', \
+        color='darkred', label='Feels Like Avg (°C)', linewidth=2)
+    ax1.set_ylabel('Temperature (°C)', color='red')
+    ax1.tick_params(axis='y', labelcolor='red')
+    ax1.legend(loc='upper left', fontsize=9)
+
+    # Subplot 2: Rain Probability, Rain Amount, Humidity, Wind Speed
+    x_indices = range(len(dates))
+    ax2.bar([x - 0.2 for x in x_indices], avg_pop, alpha=0.2, \
+        color='cyan', label='Rain Probability (%)', width=0.4, hatch='//')
+    ax2.bar([x + 0.2 for x in x_indices], total_rain, alpha=0.4, \
+        color='navy', label='Total Rain Amount (mm)', width=0.4)
+    ax2.plot(dates, avg_humidity, marker='^', linestyle='--', \
+        color='blue', label='Humidity (%)', linewidth=1.5)
+    ax2.plot(dates, avg_wind_speed, marker='s', linestyle='-', \
+        color='green', label='Wind Speed (m/s)', linewidth=2)
+    ax2.set_ylabel('Rainfall (mm)\nHumidity (%) / Wind Speed (m/s)', color='blue')
+    ax2.tick_params(axis='y', labelcolor='blue')
+    ax2.legend(loc='upper left', fontsize=9)
+
+    # Set the x-axis label for the entire figure
+    plt.xticks(rotation=45, ha="right", fontsize=10)
+    plt.xlabel('Date', fontsize=12)
+
+    # Title for the entire figure
+    plt.suptitle(f"6-Day Weather Forecast - {city_name}", fontsize=16)
+
+    # Adjust layout for better readability
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    # Add a grid for better readability
+    ax1.grid(visible=True, which='both', linestyle='--', linewidth=0.5)
+    ax2.grid(visible=True, which='both', linestyle='--', linewidth=0.5)
+
+    image_path = f"{city_name}_daily_forecast.png"
+    plt.savefig(image_path, bbox_inches='tight')
+    plt.close()
 
     embed = discord.Embed(
         title=f"**6-Day Weather Forecast for {city_name}:**",
+        description="Here is the detailed weather forecast for the next 6 days.",
         color=0x1abc9c
     )
 
-    for date, values in list(daily_data.items())[:6]:
-        min_temp = min(values['temps'])
-        max_temp = max(values['temps'])
-        avg_humidity = sum(values['humidities']) // len(values['humidities'])
-        total_rain = sum(values['rain'])
+    embed.set_image(url="attachment://" + image_path)
 
-        description = max(set(values['descriptions']), key=values['descriptions'].count)
-        weather_emoji = weather_emojis.get(description.lower(), "🌍")
+    for day in dates:
+        min_temp = min(daily_data[day]['temps'])
+        max_temp = max(daily_data[day]['temps'])
+        avg_feel = sum(daily_data[day]['feels_like']) / len(daily_data[day]['feels_like'])
+        avg_hum = sum(daily_data[day]['humidities']) / len(daily_data[day]['humidities'])
+        avg_wind = sum(daily_data[day]['wind_speeds']) / len(daily_data[day]['wind_speeds'])
+        total_rain = sum(daily_data[day]['rain'])
+        avg_pop = sum(daily_data[day]['pop']) / len(daily_data[day]['pop'])
 
         embed.add_field(
-            name=f"{date}",
-            value=(f"{weather_emoji} {description.title()}\n"
-                   f"🌡️ High: {max_temp}°C, Low: {min_temp}°C\n"
-                   f"💧 Avg Humidity: {avg_humidity}%\n"
-                   f"🌧️ Total Rain: {total_rain} mm"),
+            name=f"{day}",
+            value=(
+                f"🌡️ Max Temp: {max_temp}°C\n"
+                f"🌡️ Min Temp: {min_temp}°C\n"
+                f"🔥 Feels Like Avg: {avg_feel:.2f}°C\n"
+                f"💧 Humidity Avg: {avg_hum:.2f}%\n"
+                f"🌬️ Wind Speed Avg: {avg_wind:.2f} m/s\n"
+                f"🌧️ Rain Probability Avg: {avg_pop:.2f}%\n"
+                f"🌧️ Total Rain Amount: {total_rain} mm"
+            ),
             inline=False
         )
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, file=discord.File(image_path))
+
+    if os.path.exists(image_path):
+        os.remove(image_path)
 
 basin = tracks.TrackDataset(basin='north_atlantic')
 
@@ -373,7 +549,7 @@ async def hurricane(interaction, *, stormname_year: str):
     try:
         storm_name, year = stormname_year.split()
         year = int(year)
-
+        
         # Retrieve specific storm by name and year
         storm = basin.get_storm((storm_name, year))
 
