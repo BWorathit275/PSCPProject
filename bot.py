@@ -179,6 +179,8 @@ async def weather(interaction, *, city: str):
     aqi_level = aqi_levels[int(aqi) - 1] if isinstance(aqi, int) and 1 <= aqi <= 5 else "N/A"
     aqi_color = aqi_colors[int(aqi) - 1] if isinstance(aqi, int) and 1 <= aqi <= 5 else 0x1abc9c
 
+    icon_code = data['weather'][0]['icon']  # e.g., '01d' for a sunny day
+    icon_url = f"http://openweathermap.org/img/wn/{icon_code}@2x.png"
     # Warnings
     warnings = []
     if temperature < config["temperature_levels"]["cold"]["max"]:
@@ -195,12 +197,19 @@ async def weather(interaction, *, city: str):
     if uv_index != "N/A" and uv_index > config["uv_levels"]["high"]["min"]:
         warnings.append(config["warnings"]["uv_index"])
 
+    if isinstance(aqi, int) and 1 <= aqi <= 5:
+        aqi_level_key = config["aqi_levels"][aqi - 1].lower().replace(" ", "_")
+        aqi_warning = config.get("aqi_warnings", {}).get(aqi_level_key, None)
+        if aqi_warning:
+            warnings.append(aqi_warning)
+
     # Embed for weather data
     embed = discord.Embed(
         title=f"Weather in {city_name}, {country}",
         description=f"{weather_emoji} **{weather_description.capitalize()}**",
         color=aqi_color
     )
+    embed.set_thumbnail(url=icon_url)
     embed.add_field(name="🌡️ Temperature", value=f"{temperature}°C (Feels like\
 {feels_like}°C)\nLevel: {get_level(temperature, config['temperature_levels'])}", inline=True)
     embed.add_field(name="💧 Humidity", value=f"{humidity}% \
@@ -219,7 +228,8 @@ async def weather(interaction, *, city: str):
     embed.add_field(name="🌇 Sunset", value=sunset, inline=True)
 
     if warnings:
-        embed.add_field(name="⚠️ Warnings", value="\n".join(warnings), inline=False)
+        embed.add_field(name="⚠️ Warnings", value="\n".join([f"• {warning}" \
+            for warning in warnings]), inline=False)
 
     embed.set_footer(text=f"Last updated: {last_updated}, provided by OpenWeather")
     await interaction.response.send_message(embed=embed)

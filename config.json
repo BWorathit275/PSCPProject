@@ -23,13 +23,9 @@
     },
   
     "statuses": [
-      "tbd",
-      "tbd",
-      "tbd",
-      "tbd",
-      "tbd",
-      "tbd",
-      "tbd"
+      "hi",
+      "Project go crazy",
+      "/cmds"
     ],
   
     "aqi_levels": [
@@ -87,10 +83,18 @@
       "temphot": "High temperature level detected. Stay hydrated and avoid prolonged outdoor activities.",
       "humidity": "High humidity level detected. Consider staying indoors.",
       "wind_speed": "Strong winds expected. Secure outdoor objects and avoid high areas.",
-      "uv_index": "High UV levels detected. Wear protective clothing.",
-      "aqi": "Unhealthy Air Quality detected. Consider wearing a mask outdoors."
+      "uv_index": "High UV levels detected. Wear protective clothing."
     },
   
+    "aqi_warnings": {
+    "good": "Air quality is good. You can enjoy outdoor activities.",
+    "moderate": "Air quality is acceptable; however, some pollutants may slightly affect unusually sensitive people.",
+    "slightly_unhealthy": "Air quality is slightly unhealthy. People with respiratory issues should limit outdoor activities.",
+    "unhealthy": "Air quality is unhealthy. Consider limiting outdoor activities, especially those with health problem.",
+    "very_unhealthy": "Air quality is very unhealthy. Avoid outdoor activities if possible.",
+    "hazardous": "Air quality is hazardous. Stay indoors and avoid all outdoor physical activities."
+    },
+
     "rain_levels": {
       "no_rain": { "max": 0, "description": "No Rain" },
       "light_rain": { "min": 0.1, "max": 2.5, "description": "Light Rain" },
