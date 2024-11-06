@@ -45,9 +45,9 @@ def get_weather_data(url, params):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
-        logger.error(f"HTTP error occurred: {http_err}")
+        logger.error("HTTP error occurred: %s", http_err)
     except requests.exceptions.RequestException as req_err:
-        logger.error(f"Request error occurred: {req_err}")
+        logger.error("Request error occurred: %s", req_err)
     return None
 
 def get_level(value, levels):
@@ -92,10 +92,11 @@ async def status_task():
 async def on_ready():
     """Bot ready event handler."""
     logger.info("Bot is ready.")
+    await client.tree.sync()
     status_task.start()
 
-@client.command()
-async def city(ctx):
+@client.tree.command()
+async def custom_city(interaction):
     """Displays available custom cities."""
     cities_list = "\n".join([city.title() for city in config["custom_cities"]])
     embed = discord.Embed(
@@ -103,10 +104,10 @@ async def city(ctx):
         description=cities_list,
         color=0x1abc9c
     )
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
-@client.command()
-async def cmds(ctx):
+@client.tree.command()
+async def cmds(interaction):
     """Displays available bot commands."""
     commands_list = "\n".join([f"!{command} - {desc}" for command, desc in \
 config["commands"].items()])
@@ -115,10 +116,10 @@ config["commands"].items()])
         description=commands_list,
         color=0x1abc9c
     )
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
-@client.command()
-async def weather(ctx, *, city: str):
+@client.tree.command()
+async def weather(interaction, *, city: str):
     """Fetches and displays weather for the specified city."""
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     aqi_url = "http://api.openweathermap.org/data/2.5/air_pollution"
@@ -136,7 +137,8 @@ async def weather(ctx, *, city: str):
         geocode_data = get_weather_data(geocode_url, geocode_params)
 
         if not geocode_data:
-            await ctx.send("City not found. Please check the spelling or try a different city.")
+            await interaction.response.send_message("City not found. Please check the\
+                spelling or try a different city.")
             return
 
         lat = geocode_data[0]['lat']
@@ -147,7 +149,8 @@ async def weather(ctx, *, city: str):
     params = {'lat': lat, 'lon': lon, 'appid': weather_api_key, 'units': 'metric'}
     data = get_weather_data(base_url, params)
     if not data or data.get('cod') != 200:
-        await ctx.send(f"Error: {data.get('message', 'Could not retrieve weather data.')}")
+        await interaction.response.send_message(f"Error: {data.get('message', '\
+            Could not retrieve weather data.')}")
         return
 
     # Process data
@@ -219,17 +222,18 @@ async def weather(ctx, *, city: str):
         embed.add_field(name="⚠️ Warnings", value="\n".join(warnings), inline=False)
 
     embed.set_footer(text=f"Last updated: {last_updated}, provided by OpenWeather")
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
-@client.command()
-async def forecast(ctx, *, city: str):
+@client.tree.command()
+async def main_forecast(interaction, *, city: str):
     """Provides buttons for hourly or 6-day forecast."""
     geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
     geocode_params = {'q': city, 'appid': weather_api_key, 'limit': 1}
     geocode_data = get_weather_data(geocode_url, geocode_params)
 
     if not geocode_data:
-        await ctx.send("City not found. Please check the spelling or try a different city.")
+        await interaction.response.send_message("City not found. Please check the\
+            spelling or try a different city.")
         return
 
     lat = geocode_data[0]['lat']
@@ -252,7 +256,7 @@ async def forecast(ctx, *, city: str):
     button_hourly.callback = hourly_callback
     button_daily.callback = daily_callback
 
-    await ctx.send(f"Choose the forecast type for {city_name}:", view=view)
+    await interaction.response.send_message(f"Choose the forecast type for {city_name}:", view=view)
 
 async def send_hourly_forecast(interaction, city_name, lat, lon):
     """Displays 3-hour weather forecast for the next 36 hours."""
@@ -349,15 +353,15 @@ async def send_daily_forecast(interaction, city_name, lat, lon):
 
 basin = tracks.TrackDataset(basin='north_atlantic')
 
-@client.command()
-async def hurricane(ctx, *, storm_name_year: str):
+@client.tree.command()
+async def hurricane(interaction, *, stormname_year: str):
     """
     Command to retrieve and display information about a tropical cyclone.
     Usage: !hurricane [Storm Name] [Year]
     Example: !hurricane Dorian 2019
     """
     try:
-        storm_name, year = storm_name_year.split()
+        storm_name, year = stormname_year.split()
         year = int(year)
 
         # Retrieve specific storm by name and year
@@ -365,7 +369,8 @@ async def hurricane(ctx, *, storm_name_year: str):
 
         # Check if storm data was found
         if not storm:
-            await ctx.send(f"Storm '{storm_name} {year}' not found in the data.")
+            await interaction.response.send_message(f"Storm '{storm_name}\
+                {year}' not found in the data.")
             return
 
         # Get basic storm information from the dictionary structure
@@ -418,15 +423,15 @@ async def hurricane(ctx, *, storm_name_year: str):
         plt.close()  # Close the plot to free up memory
 
         # Send the embed
-        await ctx.send(embed=embed)
-        await ctx.send(file=discord.File(image_path))
+        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(file=discord.File(image_path))
 
     except ValueError:
-        await ctx.send("Provide the storm name and year in the format:\
-!hurricane [Storm Name] [Year]")
-    except Exception as e:
-        logger.error(f"Error retrieving cyclone data: {e}")
-        await ctx.send("An error occurred")
+        await interaction.response.send_message("Provide the storm name and year in the format:\
+            /hurricane [Storm Name] [Year]")
+    except KeyError as e:
+        logger.error("Error retrieving cyclone data: %s", e)
+        await interaction.response.send_message("An error occurred")
     finally:
         # Clean up image file
         if os.path.exists(image_path):
