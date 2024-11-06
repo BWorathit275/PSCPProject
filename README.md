@@ -51,7 +51,7 @@
 ## Requirements
 
 - Python 3.8+
-- Libraries: `discord`, `requests`, `matplotlib`, `tropycal`, `dotenv`
+- Libraries: In botrequirement.txt
 - Discord bot token and OpenWeather API key
 
 
