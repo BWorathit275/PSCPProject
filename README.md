@@ -39,7 +39,7 @@
 
 ## Usage
 
-- **Run the bot**:
+- **Run the bot**
 
 - **Basic Commands**:
   - `/weather [city]`: Get the current weather for a specified city.
