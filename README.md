@@ -8,7 +8,7 @@ DiscordBot
 ✅ Secure API
 ✅ Implement !weather
 ⚠️ Implement !forecast
-⚠️ Implement !hurricane
+✅ Implement !hurricane
 
 !weather
 ✅ Foundation 
@@ -30,7 +30,7 @@ DiscordBot
 !forecast
 ✅ Foundation 
 ✅ Secure API
-⚠️ Designing Output
+✅ Designing Output
 ✅ 3-Hour Interval Forecast Option
 ✅ 6 Days Forecast Option
 TBD 
@@ -39,9 +39,10 @@ TBD
 ✅ Foundation
 ✅ Download Dependencies for tropycal
 ✅ Show Hurricane Data (Pre-2024)
-⚠️ Designing Output
+✅ Designing Output
 
 qol stuff
 ✅ Moving Dict to external config
 ❌ get bot to run 24/7
-⚠️ fix pep8 related code problem
+✅ fix pep8 related code problem
+✅ convert ! commands to new / commands system
